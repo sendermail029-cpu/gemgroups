@@ -30,7 +30,15 @@ export function isVercelRuntime() {
 }
 
 function clean(value: unknown): string {
-  return typeof value === 'string' ? value.trim() : ''
+  if (typeof value === 'string') {
+    return value.trim()
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value).trim()
+  }
+
+  return ''
 }
 
 function getLeadsFilePath() {
