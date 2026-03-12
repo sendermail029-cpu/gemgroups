@@ -1,0 +1,5 @@
+Place your GEM.png logo here. 
+The logo is referenced in:
+- src/app/layout.tsx (Navbar)
+- src/components/layout/Navbar.tsx
+- src/components/sections/HeroSection.tsx
