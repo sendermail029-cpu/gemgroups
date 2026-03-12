@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useState } from 'react'
 import { AlertCircle, CheckCircle2, Mail, MessageCircle, TableProperties } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
@@ -65,11 +64,15 @@ export default function LeadsDashboard({
   integrations,
   vercelRuntime,
 }: LeadsDashboardProps) {
-  const [dateFilter, setDateFilter] = useState<'all' | 'last7' | 'month' | 'custom'>('all')
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'last7' | 'month' | 'custom'>('all')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
 
   const now = new Date()
+  const startOfToday = new Date(now)
+  startOfToday.setHours(0, 0, 0, 0)
+  const endOfToday = new Date(now)
+  endOfToday.setHours(23, 59, 59, 999)
   const filteredLeads = leads.filter((lead) => {
     if (!lead.createdAt || dateFilter === 'all') {
       return true
@@ -78,6 +81,10 @@ export default function LeadsDashboard({
     const createdAt = new Date(lead.createdAt)
     if (Number.isNaN(createdAt.getTime())) {
       return false
+    }
+
+    if (dateFilter === 'today') {
+      return createdAt >= startOfToday && createdAt <= endOfToday
     }
 
     if (dateFilter === 'last7') {
@@ -114,6 +121,60 @@ export default function LeadsDashboard({
   const newCount = filteredLeads.filter((lead) => lead.status === 'new').length
   const totalLeads = leads.length
   const configuredCount = Object.values(integrations).filter(Boolean).length
+
+  function escapeCsv(value: unknown) {
+    const text = value == null ? '' : String(value)
+    const escaped = text.replace(/"/g, '""')
+    return `"${escaped}"`
+  }
+
+  function handleDownloadFilteredCsv() {
+    const headers = [
+      'id',
+      'name',
+      'phone',
+      'email',
+      'project',
+      'plotSize',
+      'message',
+      'source',
+      'createdAt',
+      'status',
+    ]
+
+    const rows = filteredLeads.map((lead) =>
+      [
+        lead.id,
+        lead.name,
+        lead.phone,
+        lead.email,
+        lead.project,
+        lead.plotSize,
+        lead.message,
+        lead.source,
+        lead.createdAt,
+        lead.status,
+      ]
+        .map(escapeCsv)
+        .join(',')
+    )
+
+    const csv = [headers.join(','), ...rows].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    const suffix =
+      dateFilter === 'custom'
+        ? `${startDate || 'start'}-to-${endDate || 'end'}`
+        : dateFilter
+
+    link.href = url
+    link.download = `gem-group-leads-${suffix}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <section className="min-h-screen bg-[#f7f4ed] pt-28 pb-14 lg:pt-32 lg:pb-20">
@@ -165,12 +226,13 @@ export default function LeadsDashboard({
                 <CheckCircle2 size={16} />
                 {vercelRuntime ? 'External delivery mode active' : 'Local lead storage active'}
               </div>
-              <Link
-                href="/api/leads/export"
+              <button
+                type="button"
+                onClick={handleDownloadFilteredCsv}
                 className="inline-flex items-center justify-center rounded-full bg-gold px-5 py-2.5 font-heading text-sm font-semibold uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90"
               >
-                Download Leads CSV
-              </Link>
+                Download Filtered CSV
+              </button>
             </div>
           </div>
 
@@ -193,6 +255,7 @@ export default function LeadsDashboard({
               <div className="flex flex-wrap gap-2">
                 {[
                   { id: 'all', label: 'All Leads' },
+                  { id: 'today', label: 'Today' },
                   { id: 'last7', label: 'Last 7 Days' },
                   { id: 'month', label: 'This Month' },
                   { id: 'custom', label: 'Custom Range' },
@@ -200,7 +263,9 @@ export default function LeadsDashboard({
                   <button
                     key={filter.id}
                     type="button"
-                    onClick={() => setDateFilter(filter.id as 'all' | 'last7' | 'month' | 'custom')}
+                    onClick={() =>
+                      setDateFilter(filter.id as 'all' | 'today' | 'last7' | 'month' | 'custom')
+                    }
                     className={`rounded-full px-4 py-2 text-sm font-heading font-semibold uppercase tracking-[0.12em] transition-colors ${
                       dateFilter === filter.id
                         ? 'bg-primary text-white'
