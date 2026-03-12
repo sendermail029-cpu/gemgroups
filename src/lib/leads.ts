@@ -23,6 +23,8 @@ export interface CreateLeadResult {
   deliveries: DeliveryResult[]
 }
 
+type RawLead = Lead | Record<string, unknown>
+
 export function isVercelRuntime() {
   return Boolean(process.env.VERCEL)
 }
@@ -39,14 +41,88 @@ function getLeadsFilePath() {
   return join(process.cwd(), 'data', 'leads.json')
 }
 
+function normalizeLead(input: RawLead): Lead {
+  const record = input as Record<string, unknown>
+
+  return {
+    id: clean(record.id) || undefined,
+    name: clean(record.name),
+    phone: clean(record.phone),
+    email: clean(record.email) || null,
+    project: clean(record.project) || null,
+    plotSize: clean(record.plotSize) || null,
+    message: clean(record.message) || null,
+    source: clean(record.source) || 'website',
+    createdAt: clean(record.createdAt) || undefined,
+    status: clean(record.status) || 'new',
+  }
+}
+
+function sortLeads(leads: Lead[]) {
+  return [...leads].sort((a, b) => {
+    const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+    const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
+    return bTime - aTime
+  })
+}
+
+async function readSheetLeads(): Promise<Lead[]> {
+  const url = process.env.LEADS_GOOGLE_SHEETS_WEBHOOK_URL
+  if (!url) {
+    return []
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      return []
+    }
+
+    const data: unknown = await response.json()
+    const parsed = data as { leads?: RawLead[]; rows?: RawLead[] } | RawLead[]
+    const rows: RawLead[] = Array.isArray(parsed)
+      ? parsed
+      : Array.isArray(parsed?.leads)
+        ? parsed.leads
+        : Array.isArray(parsed?.rows)
+          ? parsed.rows
+          : []
+
+    return sortLeads(
+      rows
+        .map((row: RawLead) => normalizeLead(row))
+        .filter((lead: Lead) => lead.name && lead.phone)
+    )
+  } catch {
+    return []
+  }
+}
+
 export async function readLeads(): Promise<Lead[]> {
   try {
     const data = await readFile(getLeadsFilePath(), 'utf-8')
     const parsed = JSON.parse(data)
-    return Array.isArray(parsed) ? parsed : []
+    const leads = Array.isArray(parsed) ? parsed.map((lead) => normalizeLead(lead)) : []
+
+    if (leads.length > 0) {
+      return sortLeads(leads)
+    }
   } catch {
-    return []
+    // Fall through to external lead source if available.
   }
+
+  if (isVercelRuntime()) {
+    return readSheetLeads()
+  }
+
+  return []
 }
 
 export async function saveLeads(leads: Lead[]) {
@@ -112,6 +188,116 @@ export function getConfiguredDeliveryChannels() {
   ].filter((item) => item.url)
 }
 
+function getSheetPayload(lead: Lead) {
+  return {
+    id: lead.id,
+    name: lead.name,
+    phone: lead.phone,
+    email: lead.email ?? '',
+    project: lead.project ?? '',
+    plotSize: lead.plotSize ?? '',
+    message: lead.message ?? '',
+    source: lead.source ?? 'website',
+    createdAt: lead.createdAt,
+    status: lead.status,
+    channel: 'google-sheets',
+  }
+}
+
+async function parseResponseDetail(response: Response) {
+  const contentType = response.headers.get('content-type') || ''
+
+  try {
+    if (contentType.includes('application/json')) {
+      const data = await response.json()
+      if (typeof data?.message === 'string' && data.message.trim()) {
+        return data.message.trim()
+      }
+      if (typeof data?.error === 'string' && data.error.trim()) {
+        return data.error.trim()
+      }
+    } else {
+      const text = await response.text()
+      if (text.trim()) {
+        return text.trim().slice(0, 300)
+      }
+    }
+  } catch {
+    return ''
+  }
+
+  return ''
+}
+
+async function deliverLead(channel: DeliveryResult['channel'], url: string, lead: Lead): Promise<DeliveryResult> {
+  const isGoogleSheets = channel === 'google-sheets'
+  const sheetPayload = getSheetPayload(lead)
+
+  const requests = isGoogleSheets
+    ? [
+        {
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...sheetPayload,
+            lead,
+          }),
+        },
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: new URLSearchParams(
+            Object.entries(sheetPayload).reduce<Record<string, string>>((acc, [key, value]) => {
+              acc[key] = value ?? ''
+              return acc
+            }, {})
+          ).toString(),
+        },
+      ]
+    : [
+        {
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            channel,
+            lead,
+          }),
+        },
+      ]
+
+  let lastFailure = `${channel} delivery failed.`
+
+  for (const request of requests) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: request.headers,
+        body: request.body,
+        cache: 'no-store',
+      })
+
+      if (response.ok) {
+        return {
+          channel,
+          ok: true,
+          detail: `${channel} delivery succeeded.`,
+        }
+      }
+
+      const responseDetail = await parseResponseDetail(response)
+      lastFailure = responseDetail
+        ? `${channel} delivery failed with status ${response.status}: ${responseDetail}`
+        : `${channel} delivery failed with status ${response.status}.`
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : 'Unknown delivery error.'
+      lastFailure = `${channel} delivery failed: ${detail}`
+    }
+  }
+
+  return {
+    channel,
+    ok: false,
+    detail: lastFailure,
+  }
+}
+
 async function notifyLeadChannels(lead: Lead): Promise<DeliveryResult[]> {
   const active = getConfiguredDeliveryChannels()
   if (!active.length) {
@@ -119,42 +305,7 @@ async function notifyLeadChannels(lead: Lead): Promise<DeliveryResult[]> {
   }
 
   const results = await Promise.all(
-    active.map(async ({ channel, url }) => {
-      try {
-        const response = await fetch(url as string, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            channel,
-            lead,
-          }),
-          cache: 'no-store',
-        })
-
-        if (!response.ok) {
-          return {
-            channel,
-            ok: false,
-            detail: `${channel} delivery failed with status ${response.status}.`,
-          } satisfies DeliveryResult
-        }
-
-        return {
-          channel,
-          ok: true,
-          detail: `${channel} delivery succeeded.`,
-        } satisfies DeliveryResult
-      } catch (error) {
-        const detail = error instanceof Error ? error.message : 'Unknown delivery error.'
-        return {
-          channel,
-          ok: false,
-          detail: `${channel} delivery failed: ${detail}`,
-        } satisfies DeliveryResult
-      }
-    })
+    active.map(({ channel, url }) => deliverLead(channel, url as string, lead))
   )
 
   return results
