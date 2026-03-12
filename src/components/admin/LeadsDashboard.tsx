@@ -1,21 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useState } from 'react'
 import { AlertCircle, CheckCircle2, Mail, MessageCircle, TableProperties } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import type { Lead } from '@/types'
 
 interface LeadsDashboardProps {
+  leads: Lead[]
   integrations: {
     email: boolean
     whatsapp: boolean
     googleSheets: boolean
   }
-}
-
-interface LeadsResponse {
-  leads: Lead[]
-  total: number
+  vercelRuntime: boolean
 }
 
 function getProjectLabel(project: string | null | undefined) {
@@ -62,49 +60,59 @@ function IntegrationBadge({
   )
 }
 
-export default function LeadsDashboard({ integrations }: LeadsDashboardProps) {
-  const [leads, setLeads] = useState<Lead[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+export default function LeadsDashboard({
+  leads,
+  integrations,
+  vercelRuntime,
+}: LeadsDashboardProps) {
+  const [dateFilter, setDateFilter] = useState<'all' | 'last7' | 'month' | 'custom'>('all')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
 
-  useEffect(() => {
-    let active = true
+  const now = new Date()
+  const filteredLeads = leads.filter((lead) => {
+    if (!lead.createdAt || dateFilter === 'all') {
+      return true
+    }
 
-    async function loadLeads() {
-      setLoading(true)
-      setError('')
+    const createdAt = new Date(lead.createdAt)
+    if (Number.isNaN(createdAt.getTime())) {
+      return false
+    }
 
-      try {
-        const response = await fetch('/api/leads', { cache: 'no-store' })
-        const result: LeadsResponse = await response.json()
+    if (dateFilter === 'last7') {
+      const sevenDaysAgo = new Date(now)
+      sevenDaysAgo.setDate(now.getDate() - 7)
+      sevenDaysAgo.setHours(0, 0, 0, 0)
+      return createdAt >= sevenDaysAgo
+    }
 
-        if (!response.ok) {
-          throw new Error('Unable to load leads right now.')
-        }
+    if (dateFilter === 'month') {
+      return (
+        createdAt.getFullYear() === now.getFullYear() &&
+        createdAt.getMonth() === now.getMonth()
+      )
+    }
 
-        if (active) {
-          setLeads(Array.isArray(result.leads) ? result.leads : [])
-        }
-      } catch (err) {
-        if (active) {
-          setError(err instanceof Error ? err.message : 'Unable to load leads right now.')
-        }
-      } finally {
-        if (active) {
-          setLoading(false)
-        }
+    if (dateFilter === 'custom') {
+      const start = startDate ? new Date(`${startDate}T00:00:00`) : null
+      const end = endDate ? new Date(`${endDate}T23:59:59.999`) : null
+
+      if (start && createdAt < start) {
+        return false
+      }
+
+      if (end && createdAt > end) {
+        return false
       }
     }
 
-    loadLeads()
+    return true
+  })
 
-    return () => {
-      active = false
-    }
-  }, [])
-
-  const total = leads.length
-  const newCount = leads.filter((lead) => lead.status === 'new').length
+  const total = filteredLeads.length
+  const newCount = filteredLeads.filter((lead) => lead.status === 'new').length
+  const totalLeads = leads.length
   const configuredCount = Object.values(integrations).filter(Boolean).length
 
   return (
@@ -117,18 +125,23 @@ export default function LeadsDashboard({ integrations }: LeadsDashboardProps) {
               Website enquiries
             </h1>
             <p className="mt-3 max-w-2xl font-body text-sm leading-7 text-mid-gray sm:text-base">
-              Review leads captured from the website forms. Local lead saving works even if email,
-              WhatsApp, or Google Sheets integrations are not configured.
+              {vercelRuntime
+                ? 'Production uses external lead delivery. This page is a working snapshot filtered from the current lead source.'
+                : 'Review leads captured from the website forms. Local saving works even if email, WhatsApp, or Google Sheets are not configured yet.'}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:w-[22rem]">
             <div className="rounded-[22px] border border-[#eadfca] bg-white px-5 py-5">
-              <div className="font-heading text-3xl font-extrabold text-primary-deep">{loading ? '-' : total}</div>
-              <div className="mt-2 font-body text-xs uppercase tracking-[0.18em] text-slate-500">Total leads</div>
+              <div className="font-heading text-3xl font-extrabold text-primary-deep">{total}</div>
+              <div className="mt-2 font-body text-xs uppercase tracking-[0.18em] text-slate-500">
+                Filtered leads
+              </div>
             </div>
             <div className="rounded-[22px] border border-[#eadfca] bg-white px-5 py-5">
-              <div className="font-heading text-3xl font-extrabold text-gold">{loading ? '-' : newCount}</div>
-              <div className="mt-2 font-body text-xs uppercase tracking-[0.18em] text-slate-500">New status</div>
+              <div className="font-heading text-3xl font-extrabold text-gold">{newCount}</div>
+              <div className="mt-2 font-body text-xs uppercase tracking-[0.18em] text-slate-500">
+                New status
+              </div>
             </div>
           </div>
         </div>
@@ -138,12 +151,26 @@ export default function LeadsDashboard({ integrations }: LeadsDashboardProps) {
             <div>
               <h2 className="font-heading text-2xl font-bold text-dark">Integrations</h2>
               <p className="mt-2 font-body text-sm leading-6 text-mid-gray">
-                Configured channels: {configuredCount} of 3. If all are not configured, leads still save in this dashboard and in the local JSON file.
+                Configured channels: {configuredCount} of 3.{' '}
+                {vercelRuntime
+                  ? 'On Vercel, a form succeeds only when at least one configured delivery channel accepts the lead.'
+                  : 'If any are not configured, leads still save in this dashboard and in the local JSON file.'}
+              </p>
+              <p className="mt-2 font-body text-sm leading-6 text-mid-gray">
+                Showing {total} of {totalLeads} leads.
               </p>
             </div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/8 px-4 py-2 text-sm font-body text-primary-deep">
-              <CheckCircle2 size={16} />
-              Local lead storage active
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/8 px-4 py-2 text-sm font-body text-primary-deep">
+                <CheckCircle2 size={16} />
+                {vercelRuntime ? 'External delivery mode active' : 'Local lead storage active'}
+              </div>
+              <Link
+                href="/api/leads/export"
+                className="inline-flex items-center justify-center rounded-full bg-gold px-5 py-2.5 font-heading text-sm font-semibold uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90"
+              >
+                Download Leads CSV
+              </Link>
             </div>
           </div>
 
@@ -155,21 +182,74 @@ export default function LeadsDashboard({ integrations }: LeadsDashboardProps) {
         </div>
 
         <div className="mt-8 overflow-hidden rounded-[28px] border border-[#eadfca] bg-white shadow-card">
-          {loading ? (
-            <div className="px-6 py-12 text-center sm:px-8">
-              <p className="font-body text-sm text-mid-gray">Loading leads...</p>
+          <div className="border-b border-[#f0e7d7] bg-[#fcfaf6] px-6 py-5 sm:px-8">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <h2 className="font-heading text-xl font-bold text-dark">Date filters</h2>
+                <p className="mt-1 font-body text-sm text-mid-gray">
+                  Filter leads by recent activity or a custom date range.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'all', label: 'All Leads' },
+                  { id: 'last7', label: 'Last 7 Days' },
+                  { id: 'month', label: 'This Month' },
+                  { id: 'custom', label: 'Custom Range' },
+                ].map((filter) => (
+                  <button
+                    key={filter.id}
+                    type="button"
+                    onClick={() => setDateFilter(filter.id as 'all' | 'last7' | 'month' | 'custom')}
+                    className={`rounded-full px-4 py-2 text-sm font-heading font-semibold uppercase tracking-[0.12em] transition-colors ${
+                      dateFilter === filter.id
+                        ? 'bg-primary text-white'
+                        : 'bg-white text-primary-deep ring-1 ring-[#eadfca] hover:bg-primary/5'
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          ) : error ? (
-            <div className="px-6 py-12 text-center sm:px-8">
-              <AlertCircle size={36} className="mx-auto text-red-500" />
-              <h2 className="mt-4 font-heading text-xl font-bold text-dark">Unable to load leads</h2>
-              <p className="mt-2 font-body text-sm text-mid-gray">{error}</p>
-            </div>
-          ) : leads.length === 0 ? (
+
+            {dateFilter === 'custom' ? (
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:max-w-xl">
+                <label className="font-body text-sm text-dark">
+                  <span className="mb-2 block">Start date</span>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(event) => setStartDate(event.target.value)}
+                    className="w-full rounded-2xl border border-[#eadfca] bg-white px-4 py-3 text-sm text-dark outline-none transition-colors focus:border-primary"
+                  />
+                </label>
+                <label className="font-body text-sm text-dark">
+                  <span className="mb-2 block">End date</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(event) => setEndDate(event.target.value)}
+                    className="w-full rounded-2xl border border-[#eadfca] bg-white px-4 py-3 text-sm text-dark outline-none transition-colors focus:border-primary"
+                  />
+                </label>
+              </div>
+            ) : null}
+          </div>
+
+          {leads.length === 0 ? (
             <div className="px-6 py-12 text-center sm:px-8">
               <h2 className="font-heading text-xl font-bold text-dark">No leads yet</h2>
               <p className="mt-2 font-body text-sm text-mid-gray">
                 Submit a form on the website and it will appear here.
+              </p>
+            </div>
+          ) : filteredLeads.length === 0 ? (
+            <div className="px-6 py-12 text-center sm:px-8">
+              <AlertCircle size={36} className="mx-auto text-amber-500" />
+              <h2 className="mt-4 font-heading text-xl font-bold text-dark">No leads in this range</h2>
+              <p className="mt-2 font-body text-sm text-mid-gray">
+                Try a different filter or widen the custom date range.
               </p>
             </div>
           ) : (
@@ -183,7 +263,7 @@ export default function LeadsDashboard({ integrations }: LeadsDashboardProps) {
                 <div>Created</div>
               </div>
               <div className="divide-y divide-[#f0e7d7]">
-                {leads.map((lead) => (
+                {filteredLeads.map((lead) => (
                   <div key={lead.id || `${lead.phone}-${lead.createdAt || 'lead'}`} className="px-6 py-5 sm:px-8">
                     <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr_1fr_0.8fr_0.8fr_0.9fr] lg:items-start lg:gap-4">
                       <div>
