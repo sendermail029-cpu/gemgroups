@@ -23,12 +23,16 @@ export interface CreateLeadResult {
   deliveries: DeliveryResult[]
 }
 
+export function isVercelRuntime() {
+  return Boolean(process.env.VERCEL)
+}
+
 function clean(value: unknown): string {
   return typeof value === 'string' ? value.trim() : ''
 }
 
 function getLeadsFilePath() {
-  if (process.env.VERCEL) {
+  if (isVercelRuntime()) {
     return join('/tmp', 'gem-group-projects', 'leads.json')
   }
 
@@ -89,22 +93,27 @@ export async function createLead(input: LeadInput): Promise<CreateLeadResult> {
     status: 'new',
   }
 
-  const leads = await readLeads()
-  leads.unshift(lead)
-  await saveLeads(leads)
-
   const deliveries = await notifyLeadChannels(lead)
+
+  if (!isVercelRuntime()) {
+    const leads = await readLeads()
+    leads.unshift(lead)
+    await saveLeads(leads)
+  }
+
   return { lead, deliveries }
 }
 
-async function notifyLeadChannels(lead: Lead): Promise<DeliveryResult[]> {
-  const integrations: Array<{ channel: DeliveryResult['channel']; url?: string }> = [
-    { channel: 'email', url: process.env.LEADS_EMAIL_WEBHOOK_URL },
-    { channel: 'whatsapp', url: process.env.LEADS_WHATSAPP_WEBHOOK_URL },
-    { channel: 'google-sheets', url: process.env.LEADS_GOOGLE_SHEETS_WEBHOOK_URL },
-  ]
+export function getConfiguredDeliveryChannels() {
+  return [
+    { channel: 'email' as const, url: process.env.LEADS_EMAIL_WEBHOOK_URL },
+    { channel: 'whatsapp' as const, url: process.env.LEADS_WHATSAPP_WEBHOOK_URL },
+    { channel: 'google-sheets' as const, url: process.env.LEADS_GOOGLE_SHEETS_WEBHOOK_URL },
+  ].filter((item) => item.url)
+}
 
-  const active = integrations.filter((item) => item.url)
+async function notifyLeadChannels(lead: Lead): Promise<DeliveryResult[]> {
+  const active = getConfiguredDeliveryChannels()
   if (!active.length) {
     return []
   }

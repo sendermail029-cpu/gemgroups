@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
-import { readLeads } from '@/lib/leads'
+import { isVercelRuntime, readLeads } from '@/lib/leads'
 
 export const metadata: Metadata = {
   title: 'Admin Leads | GEM Group Projects',
@@ -38,6 +38,7 @@ function IntegrationCard({
 }
 
 export default async function AdminLeadsPage() {
+  const vercelRuntime = isVercelRuntime()
   const leads = await readLeads()
   const integrations = {
     email: Boolean(process.env.LEADS_EMAIL_WEBHOOK_URL),
@@ -57,8 +58,9 @@ export default async function AdminLeadsPage() {
               Website enquiries
             </h1>
             <p className="mt-3 max-w-2xl font-body text-sm leading-7 text-mid-gray sm:text-base">
-              Review leads captured from the website forms. Local saving works even if email,
-              WhatsApp, or Google Sheets are not configured yet.
+              {vercelRuntime
+                ? 'Production uses external lead delivery. This page is only a lightweight snapshot and should not be treated as the permanent source of truth.'
+                : 'Review leads captured from the website forms. Local saving works even if email, WhatsApp, or Google Sheets are not configured yet.'}
             </p>
           </div>
 
@@ -85,17 +87,20 @@ export default async function AdminLeadsPage() {
             <div>
               <h2 className="font-heading text-2xl font-bold text-dark">Integrations</h2>
               <p className="mt-2 font-body text-sm leading-6 text-mid-gray">
-                Configured channels: {configuredCount} of 3. If any are not configured, leads
-                still save in this dashboard and in the local JSON file.
+                Configured channels: {configuredCount} of 3.{' '}
+                {vercelRuntime
+                  ? 'On Vercel, a form succeeds only when at least one configured delivery channel accepts the lead.'
+                  : 'If any are not configured, leads still save in this dashboard and in the local JSON file.'}
               </p>
               <p className="mt-2 font-body text-sm leading-6 text-mid-gray">
-                Google Sheets only receives new leads after server restart and only if the Apps
-                Script webhook deployment is working correctly.
+                {vercelRuntime
+                  ? 'Use Google Sheets as the permanent lead register in production.'
+                  : 'Google Sheets only receives new leads after server restart and only if the Apps Script webhook deployment is working correctly.'}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <div className="inline-flex items-center rounded-full bg-primary/8 px-4 py-2 text-sm font-body text-primary-deep">
-                Local lead storage active
+                {vercelRuntime ? 'External delivery mode active' : 'Local lead storage active'}
               </div>
               <Link
                 href="/api/leads/export"

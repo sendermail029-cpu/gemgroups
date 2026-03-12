@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createLead, readLeads, validateLeadInput } from '@/lib/leads'
+import {
+  createLead,
+  getConfiguredDeliveryChannels,
+  isVercelRuntime,
+  readLeads,
+  validateLeadInput,
+} from '@/lib/leads'
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,12 +19,37 @@ export async function POST(req: NextRequest) {
     const { lead, deliveries } = await createLead(body)
     console.log('New lead captured:', lead)
 
+    const configuredChannels = getConfiguredDeliveryChannels()
+    const deliverySuccesses = deliveries.filter((item) => item.ok)
     const deliveryFailures = deliveries.filter((item) => !item.ok)
+
+    if (isVercelRuntime()) {
+      if (!configuredChannels.length) {
+        return NextResponse.json(
+          {
+            error:
+              'Lead capture is not configured for production yet. Please connect Google Sheets, email, or WhatsApp delivery first.',
+          },
+          { status: 500 }
+        )
+      }
+
+      if (!deliverySuccesses.length) {
+        return NextResponse.json(
+          {
+            error:
+              deliveryFailures.map((item) => item.detail).join(' ') ||
+              'Lead delivery failed for all configured channels.',
+          },
+          { status: 500 }
+        )
+      }
+    }
 
     return NextResponse.json({
       success: true,
       message:
-        deliveryFailures.length > 0
+        deliveryFailures.length > 0 && !isVercelRuntime()
           ? 'Lead saved, but one or more external deliveries failed.'
           : 'Thank you! Our team will contact you within 2 hours.',
       leadId: lead.id,
