@@ -15,6 +15,20 @@ interface Message {
 
 type ChatStep = 'greeting' | 'ask-name' | 'ask-project' | 'ask-phone' | 'project-info' | 'done'
 
+function getProjectSlug(text: string) {
+  const msg = text.toLowerCase()
+
+  if (msg.includes('sree') || msg.includes('laxmi') || msg.includes('balaji')) {
+    return 'sree-laxmi-balaji-township'
+  }
+
+  if (msg.includes('infiniti') || msg.includes('counti')) {
+    return 'infiniti-counti'
+  }
+
+  return ''
+}
+
 const getBotResponse = (userMsg: string, step: ChatStep, name: string): { text: string; options?: string[]; nextStep: ChatStep } => {
   const msg = userMsg.toLowerCase()
 
@@ -105,7 +119,9 @@ export default function ChatBot() {
   const [input, setInput] = useState('')
   const [step, setStep] = useState<ChatStep>('greeting')
   const [userName, setUserName] = useState('')
+  const [selectedProject, setSelectedProject] = useState('')
   const [started, setStarted] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -116,19 +132,25 @@ export default function ChatBot() {
 
   const startChat = () => {
     setStarted(true)
+    setSubmitError('')
+    setSelectedProject('')
     const response = getBotResponse('', 'greeting', '')
     setMessages([{ id: 1, role: 'bot', text: response.text, options: response.options }])
     setStep(response.nextStep)
   }
 
-  const sendMessage = (text: string) => {
+  const sendMessage = async (text: string) => {
     if (!text.trim()) return
 
     const userMsg: Message = { id: Date.now(), role: 'user', text }
     setMessages((prev) => [...prev, userMsg])
     setInput('')
+    setSubmitError('')
 
     if (step === 'ask-name') setUserName(text)
+    if (step === 'ask-project') {
+      setSelectedProject(getProjectSlug(text))
+    }
 
     setTimeout(() => {
       const response = getBotResponse(text, step, userName || text)
@@ -141,6 +163,45 @@ export default function ChatBot() {
       setMessages((prev) => [...prev, botMsg])
       setStep(response.nextStep)
     }, 600)
+
+    if (step === 'ask-phone') {
+      try {
+        const response = await fetch('/api/leads', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: userName || 'Chat Visitor',
+            phone: text,
+            project: selectedProject || null,
+            source: 'chatbot',
+            message: messages
+              .map((message) => `${message.role === 'bot' ? 'Bot' : 'User'}: ${message.text}`)
+              .join('\n'),
+          }),
+        })
+
+        const result = await response.json()
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Unable to submit chat lead.')
+        }
+      } catch (error) {
+        const detail =
+          error instanceof Error ? error.message : 'Unable to submit chat lead right now.'
+
+        setSubmitError(detail)
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now() + 2,
+            role: 'bot',
+            text: `I could not save your details yet. ${detail}`,
+          },
+        ])
+      }
+    }
   }
 
   return (
@@ -218,6 +279,11 @@ export default function ChatBot() {
                   </div>
                 </div>
               ))}
+              {submitError ? (
+                <div className="rounded-sm bg-red-50 px-3 py-2 font-body text-xs leading-relaxed text-red-600">
+                  {submitError}
+                </div>
+              ) : null}
               <div ref={messagesEndRef} />
             </div>
 
