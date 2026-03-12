@@ -1,8 +1,6 @@
 import { mkdir, readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
+import { dirname, join } from 'path'
 import type { Lead } from '@/types'
-
-const LEADS_FILE = join(process.cwd(), 'data', 'leads.json')
 
 export interface LeadInput {
   name: string
@@ -29,9 +27,17 @@ function clean(value: unknown): string {
   return typeof value === 'string' ? value.trim() : ''
 }
 
+function getLeadsFilePath() {
+  if (process.env.VERCEL) {
+    return join('/tmp', 'gem-group-projects', 'leads.json')
+  }
+
+  return join(process.cwd(), 'data', 'leads.json')
+}
+
 export async function readLeads(): Promise<Lead[]> {
   try {
-    const data = await readFile(LEADS_FILE, 'utf-8')
+    const data = await readFile(getLeadsFilePath(), 'utf-8')
     const parsed = JSON.parse(data)
     return Array.isArray(parsed) ? parsed : []
   } catch {
@@ -40,8 +46,9 @@ export async function readLeads(): Promise<Lead[]> {
 }
 
 export async function saveLeads(leads: Lead[]) {
-  await mkdir(join(process.cwd(), 'data'), { recursive: true })
-  await writeFile(LEADS_FILE, JSON.stringify(leads, null, 2))
+  const leadsFile = getLeadsFilePath()
+  await mkdir(dirname(leadsFile), { recursive: true })
+  await writeFile(leadsFile, JSON.stringify(leads, null, 2))
 }
 
 export function validateLeadInput(input: LeadInput) {
