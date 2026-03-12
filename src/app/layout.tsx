@@ -30,6 +30,11 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://gemgroupprojects.com'),
+  icons: {
+    icon: '/images/GEM.svg',
+    shortcut: '/images/GEM.svg',
+    apple: '/images/GEM.svg',
+  },
   title: {
     default: 'GEM Group Projects | Leading For Secured Life | Premium Plots in Hyderabad',
     template: '%s | GEM Group Projects',
@@ -83,7 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${poppins.variable} ${dmSans.variable} ${playfair.variable}`}>
       <head>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/images/GEM.svg" type="image/svg+xml" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
