@@ -122,6 +122,7 @@ export default function ChatBot() {
   const [selectedProject, setSelectedProject] = useState('')
   const [started, setStarted] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const [isResponding, setIsResponding] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -134,26 +135,32 @@ export default function ChatBot() {
     setStarted(true)
     setSubmitError('')
     setSelectedProject('')
+    setIsResponding(false)
     const response = getBotResponse('', 'greeting', '')
     setMessages([{ id: 1, role: 'bot', text: response.text, options: response.options }])
     setStep(response.nextStep)
   }
 
   const sendMessage = async (text: string) => {
-    if (!text.trim()) return
+    if (!text.trim() || isResponding) return
+
+    const currentStep = step
+    const nextUserName = currentStep === 'ask-name' ? text : userName
+    const nextProject = currentStep === 'ask-project' ? getProjectSlug(text) : selectedProject
 
     const userMsg: Message = { id: Date.now(), role: 'user', text }
     setMessages((prev) => [...prev, userMsg])
     setInput('')
     setSubmitError('')
+    setIsResponding(true)
 
-    if (step === 'ask-name') setUserName(text)
-    if (step === 'ask-project') {
-      setSelectedProject(getProjectSlug(text))
+    if (currentStep === 'ask-name') setUserName(text)
+    if (currentStep === 'ask-project') {
+      setSelectedProject(nextProject)
     }
 
     setTimeout(() => {
-      const response = getBotResponse(text, step, userName || text)
+      const response = getBotResponse(text, currentStep, nextUserName || text)
       const botMsg: Message = {
         id: Date.now() + 1,
         role: 'bot',
@@ -162,9 +169,10 @@ export default function ChatBot() {
       }
       setMessages((prev) => [...prev, botMsg])
       setStep(response.nextStep)
+      setIsResponding(false)
     }, 600)
 
-    if (step === 'ask-phone') {
+    if (currentStep === 'ask-phone') {
       try {
         const response = await fetch('/api/leads', {
           method: 'POST',
@@ -172,9 +180,9 @@ export default function ChatBot() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            name: userName || 'Chat Visitor',
+            name: nextUserName || 'Chat Visitor',
             phone: text,
-            project: selectedProject || null,
+            project: nextProject || null,
             source: 'chatbot',
             message: messages
               .map((message) => `${message.role === 'bot' ? 'Bot' : 'User'}: ${message.text}`)
@@ -203,6 +211,10 @@ export default function ChatBot() {
       }
     }
   }
+
+  const latestBotMessageId = [...messages]
+    .reverse()
+    .find((message) => message.role === 'bot' && message.options?.length)?.id
 
   return (
     <>
@@ -260,16 +272,17 @@ export default function ChatBot() {
                     }`}>
                       {msg.text}
                     </div>
-                    {msg.options && (
+                    {msg.options && msg.id === latestBotMessageId && (
                       <div className="flex flex-wrap gap-1">
                         {msg.options.map((opt) => (
                           <button
                             key={opt}
+                            disabled={isResponding}
                             onClick={() => opt === 'WhatsApp Now'
                               ? window.open(getProjectWhatsAppLink('GEM Group Projects'), '_blank')
                               : sendMessage(opt)
                             }
-                            className="text-xs bg-primary/10 hover:bg-primary text-primary hover:text-white px-2 py-1 rounded-sm transition-colors"
+                            className="text-xs bg-primary/10 hover:bg-primary text-primary hover:text-white px-2 py-1 rounded-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             {opt}
                           </button>
@@ -295,11 +308,13 @@ export default function ChatBot() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && sendMessage(input)}
                 placeholder="Type a message..."
+                disabled={isResponding}
                 className="flex-1 text-xs font-body border border-gray-200 rounded-sm px-3 py-2 focus:outline-none focus:border-primary"
               />
               <button
+                disabled={isResponding}
                 onClick={() => sendMessage(input)}
-                className="w-8 h-8 bg-primary text-white rounded-sm flex items-center justify-center hover:bg-primary-deep transition-colors"
+                className="w-8 h-8 bg-primary text-white rounded-sm flex items-center justify-center hover:bg-primary-deep transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Send size={13} />
               </button>
