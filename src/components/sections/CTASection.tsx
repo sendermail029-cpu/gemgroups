@@ -2,9 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import Link from 'next/link'
 import { ArrowRight, Download, Phone } from 'lucide-react'
-import { getWhatsAppLink } from '@/lib/utils'
+import { displayPhoneNumber, getWhatsAppLink, phoneNumber } from '@/lib/utils'
 
 export default function CTASection() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 })
@@ -92,8 +91,8 @@ export default function CTASection() {
           className="mt-16 grid sm:grid-cols-3 gap-px bg-white/10 rounded-sm overflow-hidden"
         >
           {[
-            { icon: Phone, label: 'Call Us', value: '+91 98765 43210', href: 'tel:+919876543210' },
-            { icon: Phone, label: 'WhatsApp', value: '+91 98765 43210', href: getWhatsAppLink() },
+            { icon: Phone, label: 'Call Us', value: displayPhoneNumber, href: `tel:${phoneNumber}` },
+            { icon: Phone, label: 'WhatsApp', value: displayPhoneNumber, href: getWhatsAppLink() },
             { icon: Phone, label: 'Email Us', value: 'info@gemgroupprojects.com', href: 'mailto:info@gemgroupprojects.com' },
           ].map((item) => (
             <a

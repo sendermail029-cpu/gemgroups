@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { MapPin, Home, Maximize2, CheckCircle, ArrowRight, Phone } from 'lucide-react'
 import { projects } from '@/data/projects'
 import CTASection from '@/components/sections/CTASection'
+import { phoneNumber } from '@/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Our Projects | GEM Group Projects',
@@ -128,7 +129,7 @@ export default function ProjectsPage() {
                       <ArrowRight size={14} />
                     </Link>
                     <a
-                      href={`tel:+919876543210`}
+                      href={`tel:${phoneNumber}`}
                       className="flex items-center gap-2 border border-gray-200 text-mid-gray hover:border-primary hover:text-primary text-xs font-heading font-semibold px-4 py-3.5 rounded-sm transition-colors"
                     >
                       <Phone size={13} />

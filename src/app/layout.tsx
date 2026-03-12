@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import LeadPopup from '@/components/ui/LeadPopup'
 import ChatBot from '@/components/ui/ChatBot'
+import { phoneNumber } from '@/lib/utils'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -98,7 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: 'GEM Group Projects',
               description: 'Premium DTCP & RERA approved plotted developments in Hyderabad',
               url: 'https://gemgroupprojects.com',
-              telephone: '+91-9876543210',
+              telephone: phoneNumber,
               address: {
                 '@type': 'PostalAddress',
                 streetAddress: '#101, GEM Towers, Jubilee Hills',

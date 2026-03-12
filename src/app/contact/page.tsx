@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Clock, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
 import EnquiryForm from '@/components/ui/EnquiryForm'
-import { getWhatsAppLink } from '@/lib/utils'
+import { displayPhoneNumber, getWhatsAppLink, phoneNumber } from '@/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Contact GEM Group Projects | Book Site Visit',
@@ -13,7 +13,7 @@ const offices = [
   {
     title: 'Head Office',
     address: '#101, GEM Towers, Jubilee Hills, Hyderabad, Telangana 500033',
-    phone: '+91 98765 43210',
+    phone: displayPhoneNumber,
     email: 'info@gemgroupprojects.com',
     hours: 'Mon-Sat: 9 AM - 7 PM',
   },
@@ -36,14 +36,14 @@ const offices = [
 const quickContacts = [
   {
     label: 'Call Us',
-    value: '+91 98765 43210',
-    href: 'tel:+919876543210',
+    value: displayPhoneNumber,
+    href: `tel:${phoneNumber}`,
     icon: Phone,
     accent: 'bg-primary/10 text-primary ring-primary/15',
   },
   {
     label: 'WhatsApp',
-    value: '+91 98765 43210',
+    value: displayPhoneNumber,
     href: getWhatsAppLink(),
     icon: MessageCircle,
     accent: 'bg-[#25D366]/10 text-[#25D366] ring-[#25D366]/15',

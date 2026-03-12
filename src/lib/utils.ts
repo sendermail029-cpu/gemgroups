@@ -19,7 +19,9 @@ export function formatDate(dateString: string): string {
   })
 }
 
-export const whatsappNumber = '919876543210'
+export const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP || '919885524320'
+export const phoneNumber = process.env.NEXT_PUBLIC_PHONE || '+919885524320'
+export const displayPhoneNumber = '+91 98855 24320'
 
 export function getWhatsAppLink(message?: string): string {
   const text = encodeURIComponent(

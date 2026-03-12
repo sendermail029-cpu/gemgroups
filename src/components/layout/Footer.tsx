@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin, Phone, Mail, Facebook, Instagram, Youtube, Twitter, MessageCircle } from 'lucide-react'
-import { getWhatsAppLink } from '@/lib/utils'
+import { displayPhoneNumber, getWhatsAppLink, phoneNumber } from '@/lib/utils'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -141,11 +141,11 @@ export default function Footer() {
                 </p>
               </div>
               <a
-                href="tel:+919876543210"
+                href={`tel:${phoneNumber}`}
                 className="flex items-center gap-3 text-sm text-gray-400 transition-colors hover:text-gold"
               >
                 <Phone size={16} className="shrink-0 text-gold" />
-                +91 98765 43210
+                {displayPhoneNumber}
               </a>
               <a
                 href="tel:+919876543211"

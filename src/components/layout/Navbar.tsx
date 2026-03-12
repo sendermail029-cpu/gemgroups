@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Phone, ChevronDown } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, displayPhoneNumber, getWhatsAppLink, phoneNumber } from '@/lib/utils'
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -63,16 +63,18 @@ export default function Navbar() {
           </p>
           <div className="flex items-center gap-6">
             <a
-              href="tel:+919876543210"
+              href={`tel:${phoneNumber}`}
               className={cn('flex items-center gap-1.5 text-xs font-semibold font-heading tracking-wide transition-colors',
                 scrolled || !isHome ? 'text-primary' : 'text-gold'
               )}
             >
               <Phone size={12} />
-              +91 98765 43210
+              {displayPhoneNumber}
             </a>
             <a
-              href="https://wa.me/919876543210"
+              href={getWhatsAppLink()}
+              target="_blank"
+              rel="noopener noreferrer"
               className={cn('text-xs font-semibold font-heading tracking-wide transition-colors',
                 scrolled || !isHome ? 'text-primary' : 'text-gold'
               )}
