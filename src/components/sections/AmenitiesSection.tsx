@@ -77,7 +77,7 @@ export default function AmenitiesSection() {
               <div className="space-y-4">
                 <div className="relative h-56 rounded-sm overflow-hidden">
                   <Image
-                    src="/images/ami3.jfif"
+                    src="/images/ami3.png"
                     alt="Clubhouse"
                     fill className="object-cover"
                     sizes="300px"
@@ -95,7 +95,7 @@ export default function AmenitiesSection() {
               <div className="space-y-4 mt-8">
                 <div className="relative h-36 rounded-sm overflow-hidden">
                   <Image
-                    src="/images/ami2.jfif"
+                    src="/images/ami2.png"
                     alt="Park"
                     fill className="object-cover"
                     sizes="300px"

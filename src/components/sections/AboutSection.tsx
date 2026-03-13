@@ -109,7 +109,7 @@ export default function AboutSection() {
                 className="absolute -bottom-8 -left-8 w-44 h-44 lg:w-56 lg:h-56 rounded-sm overflow-hidden shadow-luxury border-4 border-white"
               >
                 <Image
-                  src="/images/ami3.jfif"
+                  src="/images/ami3.png"
                   alt="Community Amenities"
                   fill
                   className="object-cover"
