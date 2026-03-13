@@ -103,7 +103,7 @@ export default function Navbar() {
               ) : (
                 <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white/90 shadow-sm ring-1 ring-black/5">
                   <Image
-                    src="/images/GEM.webp"
+                    src="/images/logg.png"
                     alt="GEM Group Projects logo"
                     fill
                     sizes="40px"

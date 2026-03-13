@@ -14,7 +14,7 @@ export default function Footer() {
             <div className="mb-6 flex items-center gap-3">
               <div className="overflow-hidden rounded-full border border-white/10 bg-white shadow-sm">
                 <Image
-                  src="/images/GEM.png"
+                  src="/images/logg.png"
                   alt="GEM Group Projects logo"
                   width={40}
                   height={40}
