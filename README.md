@@ -291,7 +291,7 @@ Edit `/src/components/layout/Footer.tsx` and `/src/app/contact/page.tsx`.
 
 **GEM Group Projects**  
 📍 #101, GEM Towers, Jubilee Hills, Hyderabad  
-📞 +91 98765 43210  
+📞 +91 98855 24320  
 📧 info@gemgroupprojects.com  
 
 RERA Reg: P02400007485 | P03200003217  
