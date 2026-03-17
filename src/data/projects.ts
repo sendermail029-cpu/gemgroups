@@ -10,7 +10,7 @@ export const projects: Project[] = [
     city: 'Hyderabad',
     highway: 'NH-44 Bangalore Highway',
     price: '₹18,500/sq yd onwards',
-    pricePerSqYd: 18500,
+    pricePerSqYd: 25000,
     acres: '46 Acres',
     totalPlots: 578,
     plotSizes: '165–440 Sq Yards',
@@ -85,7 +85,7 @@ With plot sizes ranging from 165 to 440 sq yards, Sree Laxmi Balaji Township cat
       size: [165, 200, 240, 300, 360, 440][i % 6],
       unit: 'Sq Yds',
       status: i % 7 === 0 ? 'booked' : i % 11 === 0 ? 'sold' : 'available',
-      price: 18500 * [165, 200, 240, 300, 360, 440][i % 6],
+      price: 25000 * [165, 200, 240, 300, 360, 440][i % 6],
       facing: ['East', 'West', 'North', 'South'][i % 4],
       x: (i % 6) * 80 + 20,
       y: Math.floor(i / 6) * 60 + 20,
@@ -101,7 +101,7 @@ With plot sizes ranging from 165 to 440 sq yards, Sree Laxmi Balaji Township cat
     location: 'Sadashivpet, Sangareddy District',
     city: 'Hyderabad',
     highway: 'NH-65 Mumbai Highway',
-    price: '₹22,000/sq yd',
+    price: '₹20000/sq yd',
     pricePerSqYd: 22000,
     acres: '100 Acres',
     totalPlots: 1200,
@@ -122,7 +122,7 @@ With a spectacular 40,000 sqft clubhouse and world-class amenities, this communi
       'Adjacent to NIMZ SEZ Industrial Zone',
       'Near Woxsen University & Business School',
       'Regional Ring Road (RRR) Proximity',
-      'Price: ₹22,000 per sq yard',
+      'Price: ₹20000 per sq yard',
       'Bank Loans from Leading Nationalized Banks',
     ],
     amenities: [
@@ -144,6 +144,11 @@ With a spectacular 40,000 sqft clubhouse and world-class amenities, this communi
       { src: '/images/villa.jpg', alt: 'Premium plots', category: 'plots' },
     ],
     videos: [
+
+
+
+
+      
       {
         id: 'v2',
         title: 'Infiniti Counti - The Future of Premium Living',

@@ -10,7 +10,7 @@ const growthData = [
   { year: '2021', value: 54, label: '₹12,500/sqyd' },
   { year: '2022', value: 68, label: '₹15,800/sqyd' },
   { year: '2023', value: 80, label: '₹18,500/sqyd' },
-  { year: '2024', value: 95, label: '₹22,000/sqyd' },
+  { year: '2024', value: 95, label: '₹20000/sqyd' },
 ]
 
 const corridors = [
