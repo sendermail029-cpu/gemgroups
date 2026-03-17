@@ -50,7 +50,7 @@ const getBotResponse = (userMsg: string, step: ChatStep, name: string): { text: 
   if (step === 'ask-project') {
     if (msg.includes('sree') || msg.includes('laxmi') || msg.includes('balaji')) {
       return {
-        text: `Sree Laxmi Balaji Township is a 46-acre DTCP & RERA approved community in Shadnagar with 578 plots (165–440 sq yds). Starting at ₹18,500/sq yd.\n\n✅ RERA Approved\n🏛️ Clubhouse & Pool\n🛣️ Near NH-44`,
+        text: `Sree Laxmi Balaji Township is a 46-acre DTCP & RERA approved community in Shadnagar with 578 plots (165–440 sq yds). Starting at ₹25,000/sq yd.\n\n✅ RERA Approved\n🏛️ Clubhouse & Pool\n🛣️ Near NH-44`,
         options: ['Pricing Details', 'Book Site Visit', 'Location?'],
         nextStep: 'project-info',
       }
@@ -72,7 +72,7 @@ const getBotResponse = (userMsg: string, step: ChatStep, name: string): { text: 
   if (step === 'project-info') {
     if (msg.includes('price') || msg.includes('cost') || msg.includes('rate')) {
       return {
-        text: `Current pricing:\n\n• Sree Laxmi Balaji: ₹18,500/sq yd onwards\n• Infiniti Counti: ₹20000/sq yd\n\nBank loans are available from leading banks. Can I get your mobile number to share detailed brochures?`,
+        text: `Current pricing:\n\n• Sree Laxmi Balaji: ₹25,000/sq yd onwards\n• Infiniti Counti: ₹20000/sq yd\n\nBank loans are available from leading banks. Can I get your mobile number to share detailed brochures?`,
         nextStep: 'ask-phone',
       }
     }

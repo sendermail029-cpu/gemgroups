@@ -9,7 +9,7 @@ export const projects: Project[] = [
     location: 'Shadnagar, Ranga Reddy District',
     city: 'Hyderabad',
     highway: 'NH-44 Bangalore Highway',
-    price: '₹18,500/sq yd onwards',
+    price: '₹25,000/sq yd onwards',
     pricePerSqYd: 25000,
     acres: '46 Acres',
     totalPlots: 578,
