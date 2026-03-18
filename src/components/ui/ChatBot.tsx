@@ -57,7 +57,7 @@ const getBotResponse = (userMsg: string, step: ChatStep, name: string): { text: 
     }
     if (msg.includes('infiniti') || msg.includes('counti')) {
       return {
-        text: `Infiniti Counti is a mega 100-acre gated community on NH-65 near Sadashivpet. Priced at ₹20000/sq yd.\n\n🏰 40,000 sqft Clubhouse\n📍 Near NIMZ SEZ\n🎓 Near Woxsen University`,
+        text: `Infiniti Counti is a mega 100-acre gated community on NH-65 near Sadashivpet. Priced at ₹22000/sq yd.\n\n🏰 40,000 sqft Clubhouse\n📍 Near NIMZ SEZ\n🎓 Near Woxsen University`,
         options: ['Pricing Details', 'Book Site Visit', 'Location?'],
         nextStep: 'project-info',
       }
@@ -72,7 +72,7 @@ const getBotResponse = (userMsg: string, step: ChatStep, name: string): { text: 
   if (step === 'project-info') {
     if (msg.includes('price') || msg.includes('cost') || msg.includes('rate')) {
       return {
-        text: `Current pricing:\n\n• Sree Laxmi Balaji: ₹25,000/sq yd onwards\n• Infiniti Counti: ₹20000/sq yd\n\nBank loans are available from leading banks. Can I get your mobile number to share detailed brochures?`,
+        text: `Current pricing:\n\n• Sree Laxmi Balaji: ₹25,000/sq yd onwards\n• Infiniti Counti: ₹22000/sq yd\n\nBank loans are available from leading banks. Can I get your mobile number to share detailed brochures?`,
         nextStep: 'ask-phone',
       }
     }
