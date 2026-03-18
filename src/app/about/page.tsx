@@ -74,8 +74,6 @@ export default function AboutPage() {
             backgroundSize: 'cover',
           }}
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,33,58,0.9),rgba(7,33,58,0.8),rgba(7,33,58,0.45))]" />
-
         <div className="container-gem relative">
           <div className="flex min-h-[300px] items-center rounded-[18px] px-6 py-8 sm:px-10 lg:min-h-[360px] lg:px-12 lg:py-10">
             <div className="max-w-3xl text-white">
