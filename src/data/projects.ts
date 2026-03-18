@@ -101,7 +101,7 @@ With plot sizes ranging from 165 to 440 sq yards, Sree Laxmi Balaji Township cat
     location: 'Sadashivpet, Sangareddy District',
     city: 'Hyderabad',
     highway: 'NH-65 Mumbai Highway',
-    price: '₹20000/sq yd',
+    price: '₹22000/sq yd',
     pricePerSqYd: 22000,
     acres: '100 Acres',
     totalPlots: 1200,
