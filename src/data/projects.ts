@@ -118,8 +118,8 @@ With a spectacular 40,000 sqft clubhouse and world-class amenities, this communi
     highlights: [
       '100 Acres Mega Master-Planned Community',
       'Direct Highway-Facing Layout on NH-65',
-      '40,000 sqft Premium Clubhouse',
-      'Adjacent to NIMZ SEZ Industrial Zone',
+      'Adjacent to  Aroor industrial zone',
+      'NIMZ SEZ Industrial Zone',
       'Near Woxsen University & Business School',
       'Regional Ring Road (RRR) Proximity',
       'Price: ₹20000 per sq yard',
