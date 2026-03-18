@@ -47,6 +47,9 @@ export default function ProjectDetailPage({ params }: Props) {
           priority
           sizes="100vw"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-deep/50 to-transparent" />
+
         <div className="absolute inset-0 flex items-end pb-10">
           <div className="container-gem">
             <Link href="/projects" className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm mb-5 transition-colors">
