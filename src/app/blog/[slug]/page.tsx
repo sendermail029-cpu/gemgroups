@@ -116,7 +116,6 @@ export default function BlogPostPage({ params }: Props) {
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark/85 via-dark/40 to-dark/20" />
         <div className="absolute inset-0 flex items-end pb-10">
           <div className="container-gem">
             <Link href="/blog" className="inline-flex items-center gap-2 text-white/60 hover:text-gold text-sm mb-5 transition-colors">
