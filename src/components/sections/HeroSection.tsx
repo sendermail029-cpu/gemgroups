@@ -59,6 +59,10 @@ export default function HeroSection() {
         </motion.div>
       </AnimatePresence>
 
+      <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(5,11,20,0.96),rgba(10,35,61,0.82),rgba(5,11,20,0.56))]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(201,162,39,0.26),transparent_28%)]" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#050B14] via-[#050B14]/70 to-transparent" />
+
       <div className="relative z-10 mx-auto w-full max-w-[90rem] px-4 pt-32 pb-20 sm:px-6 sm:pt-36 sm:pb-24 lg:px-10 lg:pt-40 lg:pb-28 xl:px-12">
         <div className="flex w-full justify-start">
           <div className="flex w-full max-w-[35rem] flex-col items-start text-left sm:max-w-[39rem] lg:max-w-[43rem] xl:max-w-[47rem]">
