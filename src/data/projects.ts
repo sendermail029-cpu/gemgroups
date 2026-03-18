@@ -122,7 +122,7 @@ With a spectacular 40,000 sqft clubhouse and world-class amenities, this communi
       'NIMZ SEZ Industrial Zone',
       'Near Woxsen University & Business School',
       'Regional Ring Road (RRR) Proximity',
-      'Price: ₹20000 per sq yard',
+      
       'Bank Loans from Leading Nationalized Banks',
     ],
     amenities: [
