@@ -47,39 +47,43 @@ export default function ProjectDetailPage({ params }: Props) {
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-deep/50 to-transparent" />
-
         <div className="absolute inset-0 flex items-end pb-10">
           <div className="container-gem">
-            <Link href="/projects" className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm mb-5 transition-colors">
-              <ArrowLeft size={14} />
-              All Projects
-            </Link>
+            <div className="inline-block max-w-5xl rounded-[28px] bg-black/42 px-5 py-5 shadow-[0_18px_60px_rgba(0,0,0,0.32)] backdrop-blur-md sm:px-7 sm:py-6">
+              <Link href="/projects" className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm mb-5 transition-colors [text-shadow:0_2px_10px_rgba(0,0,0,0.35)]">
+                <ArrowLeft size={14} />
+                All Projects
+              </Link>
 
-            <div className="flex flex-wrap gap-2 mb-4">
-              {project.badges.map((badge) => (
-                <span key={badge} className="badge-gold">{badge}</span>
-              ))}
-            </div>
+              <div className="mb-4 flex flex-wrap gap-2">
+                {project.badges.map((badge) => (
+                  <span
+                    key={badge}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-gold-light/70 bg-gold px-3 py-1 text-xs font-semibold tracking-wide text-white shadow-[0_8px_24px_rgba(201,162,39,0.28)]"
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </div>
 
-            <h1 className="font-heading font-extrabold text-3xl lg:text-5xl text-white mb-3 leading-tight">
-              {project.name}
-            </h1>
+              <h1 className="mb-3 font-heading text-3xl font-extrabold leading-tight text-white [text-shadow:0_4px_24px_rgba(0,0,0,0.5)] lg:text-5xl">
+                {project.name}
+              </h1>
 
-            <div className="flex flex-wrap items-center gap-5 text-white/70 font-body text-sm">
-              <span className="flex items-center gap-1.5"><MapPin size={13} className="text-gold" />{project.location}</span>
-              <span className="flex items-center gap-1.5"><MapPin size={13} className="text-primary" />{project.highway}</span>
-              <span className="font-heading font-bold text-gold">{project.price}</span>
+              <div className="flex flex-wrap items-center gap-5 font-body text-sm text-white/95 [text-shadow:0_2px_14px_rgba(0,0,0,0.45)]">
+                <span className="flex items-center gap-1.5"><MapPin size={13} className="text-gold-light" />{project.location}</span>
+                <span className="flex items-center gap-1.5"><MapPin size={13} className="text-gold-light" />{project.highway}</span>
+                <span className="font-heading font-bold text-gold-light">{project.price}</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Quick stats bar */}
-      <div className="bg-primary-deep text-white">
+      <div className="bg-gold text-white">
         <div className="container-gem">
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-white/10">
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-white/20">
             {[
               { label: 'Total Area', value: project.acres },
               { label: 'Total Plots', value: project.totalPlots.toString() },
@@ -87,8 +91,8 @@ export default function ProjectDetailPage({ params }: Props) {
               { label: 'Starting Price', value: project.price },
             ].map(({ label, value }) => (
               <div key={label} className="text-center py-5 px-4">
-                <div className="font-heading font-bold text-gold text-lg mb-0.5">{value}</div>
-                <div className="font-body text-white/50 text-xs uppercase tracking-widest">{label}</div>
+                <div className="font-heading font-bold text-white text-lg mb-0.5">{value}</div>
+                <div className="font-body text-white/90 text-xs uppercase tracking-widest">{label}</div>
               </div>
             ))}
           </div>

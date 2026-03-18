@@ -15,7 +15,7 @@ export const projects: Project[] = [
     totalPlots: 578,
     plotSizes: '165–440 Sq Yards',
     status: 'available',
-    badges: ['DTCP Approved', 'RERA Approved', 'Bank Loan Available'],
+    badges: ['DTCP Approved', 'RERA Approved', 'Bank Loan Facility Available'],
     description:
       'A premium DTCP & RERA approved plotted community spread across 46 acres at Shadnagar offering 578 plots ranging from 165 to 440 sq yards — just minutes from the Bangalore Highway.',
     longDescription: `Sree Laxmi Balaji Township is a landmark plotted development that redefines premium living in the rapidly developing Shadnagar corridor. Spread across 46 lush acres, this DTCP and RERA-approved community offers 578 meticulously planned plots that harmonize modern infrastructure with serene greenery.
@@ -29,7 +29,7 @@ With plot sizes ranging from 165 to 440 sq yards, Sree Laxmi Balaji Township cat
       'Plot Sizes: 165–440 Sq Yards',
       'RERA Registration No. P02400007485',
       'DTCP Approval No. 46/2022',
-      'Bank Loans from Leading Banks',
+      'Bank Loan Facility Available',
       'Minutes from NH-44 Bangalore Highway',
       'Clear Title & Legal Documentation',
     ],
@@ -107,7 +107,7 @@ With plot sizes ranging from 165 to 440 sq yards, Sree Laxmi Balaji Township cat
     totalPlots: 1200,
     plotSizes: '200–600 Sq Yards',
     status: 'limited',
-    badges: ['Highway Facing', 'RERA Approved', 'Bank Loan Available', 'Near NIMZ SEZ'],
+    badges: ['Highway Facing', 'RERA Approved', 'Bank Loan Facility Available', 'Near NIMZ SEZ'],
     description:
       'A 100 acre mega gated community facing Mumbai NH-65 highway near Sadashivpet — surrounded by NIMZ SEZ, Woxsen Business School, and the Regional Ring Road.',
     longDescription: `Infiniti Counti stands as a visionary 100-acre mega gated community that sets a new benchmark for plotted developments in the Hyderabad region. Strategically positioned directly facing the Mumbai NH-65 highway near Sadashivpet, this landmark project offers unparalleled connectivity and investment potential.
@@ -123,7 +123,7 @@ With a spectacular 40,000 sqft clubhouse and world-class amenities, this communi
       'Near Woxsen University & Business School',
       'Regional Ring Road (RRR) Proximity',
       
-      'Bank Loans from Leading Nationalized Banks',
+      'Bank Loan Facility Available',
     ],
     amenities: [
       { icon: '🏰', name: '40,000 sqft Clubhouse', description: 'Landmark clubhouse with premium facilities' },
