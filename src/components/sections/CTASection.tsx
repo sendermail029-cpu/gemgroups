@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { ArrowRight, Download, Phone } from 'lucide-react'
-import { displayPhoneNumber, getWhatsAppLink, phoneNumber } from '@/lib/utils'
+import { displayPhoneNumber, displaySecondaryPhoneNumber, getWhatsAppLink, phoneNumber } from '@/lib/utils'
 
 export default function CTASection() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 })
@@ -92,7 +92,7 @@ export default function CTASection() {
         >
           {[
             { icon: Phone, label: 'Call Us', value: displayPhoneNumber, href: `tel:${phoneNumber}` },
-            { icon: Phone, label: 'WhatsApp', value: displayPhoneNumber, href: getWhatsAppLink() },
+            { icon: Phone, label: 'WhatsApp', value: displaySecondaryPhoneNumber, href: getWhatsAppLink() },
             { icon: Phone, label: 'Email Us', value: 'info@gemgroupprojects.com', href: 'mailto:info@gemgroupprojects.com' },
           ].map((item) => (
             <a

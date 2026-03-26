@@ -1,7 +1,13 @@
 import type { Metadata } from 'next'
 import { Clock, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
 import EnquiryForm from '@/components/ui/EnquiryForm'
-import { displayPhoneNumber, getWhatsAppLink, phoneNumber } from '@/lib/utils'
+import {
+  displayPhoneNumber,
+  displaySecondaryPhoneNumber,
+  getWhatsAppLink,
+  phoneNumber,
+  secondaryPhoneNumber,
+} from '@/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Contact GEM Group Projects | Book Site Visit',
@@ -20,14 +26,14 @@ const offices = [
   {
     title: 'Site Office - Shadnagar',
     address: 'Sree Laxmi Balaji Township, Shadnagar, Ranga Reddy District',
-    phone: '+91 98765 43211',
+    phone: displaySecondaryPhoneNumber,
     email: 'shadnagar@gemgroupprojects.com',
     hours: 'Daily: 9 AM - 6 PM',
   },
   {
     title: 'Site Office - Sadashivpet',
     address: 'Infiniti Counti, NH-65 Highway, Sadashivpet, Sangareddy',
-    phone: '+91 98765 43212',
+    phone: displaySecondaryPhoneNumber,
     email: 'sadashivpet@gemgroupprojects.com',
     hours: 'Daily: 9 AM - 6 PM',
   },
@@ -43,7 +49,7 @@ const quickContacts = [
   },
   {
     label: 'WhatsApp',
-    value: displayPhoneNumber,
+    value: displaySecondaryPhoneNumber,
     href: getWhatsAppLink(),
     icon: MessageCircle,
     accent: 'bg-[#25D366]/10 text-[#25D366] ring-[#25D366]/15',
@@ -203,7 +209,7 @@ export default function ContactPage() {
                       <div className="flex items-center gap-3">
                         <Phone size={18} className="shrink-0 text-gold" />
                         <a
-                          href={`tel:${office.phone.replace(/\s/g, '')}`}
+                          href={`tel:${office.phone === displaySecondaryPhoneNumber ? secondaryPhoneNumber : phoneNumber}`}
                           className="font-body text-sm text-primary-deep transition-colors hover:text-primary sm:text-base"
                         >
                           {office.phone}

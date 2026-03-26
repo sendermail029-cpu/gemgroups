@@ -6,7 +6,14 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Phone, ChevronDown } from 'lucide-react'
-import { cn, displayPhoneNumber, getWhatsAppLink, phoneNumber } from '@/lib/utils'
+import {
+  cn,
+  displayPhoneNumber,
+  displaySecondaryPhoneNumber,
+  getWhatsAppLink,
+  phoneNumber,
+  secondaryPhoneNumber,
+} from '@/lib/utils'
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -70,6 +77,15 @@ export default function Navbar() {
             >
               <Phone size={12} />
               {displayPhoneNumber}
+            </a>
+            <a
+              href={`tel:${secondaryPhoneNumber}`}
+              className={cn('flex items-center gap-1.5 text-xs font-semibold font-heading tracking-wide transition-colors',
+                scrolled || !isHome ? 'text-primary' : 'text-gold'
+              )}
+            >
+              <Phone size={12} />
+              {displaySecondaryPhoneNumber}
             </a>
             <a
               href={getWhatsAppLink()}
