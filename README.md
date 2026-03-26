@@ -229,7 +229,7 @@ The new project automatically appears on:
 Update your WhatsApp number in `/src/lib/utils.ts`:
 
 ```typescript
-export const whatsappNumber = '919876543210' // Replace with your number
+export const whatsappNumber = '919966776366' // Replace with your number
 ```
 
 ---
@@ -250,8 +250,8 @@ npm start
 ### Environment Variables (create `.env.local`)
 ```env
 NEXT_PUBLIC_SITE_URL=https://gemgroupprojects.com
-NEXT_PUBLIC_WHATSAPP=919876543210
-NEXT_PUBLIC_PHONE=+919876543210
+NEXT_PUBLIC_WHATSAPP=919966776366
+NEXT_PUBLIC_PHONE=+919553863456
 NEXT_PUBLIC_EMAIL=info@gemgroupprojects.com
 NEXT_PUBLIC_GOOGLE_MAPS_KEY=your_key_here
 ```
